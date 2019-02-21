@@ -1,6 +1,28 @@
-# ssurgo_extraction
-This script is to extract mukey, texture, soilname, depth, sand, slit, clay, ksat,porosity, fc, and awc.
-Some mukeys' may be seriously missing data, resulting in NA's in the outputs for those missing data mukeys'
-
-
-
+# Date analysis
+Given a series of Dates, for example,
+  w = read.table(...)
+  w$date = as.Date(paste(w[,'day'], w[,'month'], w[,'year'],sep="-"),format="%d-%m-%Y")
+  dailyTimeSeries(w$date) # we get the following information
+  
+  
+    year month yy_month day doy wday yy_woy woy7 yy_woy7   wy ydecimal
+1   1998    10        1  15 288    5      1   42       1 1998 1998.789
+7   1998    10        1  21 294    4      2   43       2 1998 1998.805
+16  1998    10        1  30 303    6      3   44       3 1998 1998.830
+20  1998    11        2   3 307    3      4   44       3 1998 1998.841
+27  1998    11        2  10 314    3      5   45       4 1998 1998.860
+36  1998    11        2  19 323    5      6   47       6 1998 1998.885
+41  1998    11        2  24 328    3      7   47       6 1998 1998.899
+51  1998    12        3   4 338    6      8   49       8 1998 1998.926
+57  1998    12        3  10 344    5      9   50       9 1998 1998.942
+65  1998    12        3  18 352    6     10   51      10 1998 1998.964
+69  1998    12        3  22 356    3     11   51      10 1998 1998.975
+77  1998    12        3  30 364    4     12   53      12 1998 1998.997
+87  1999     1        4   9   9    7     14    2      14 1998 1999.025
+93  1999     1        4  15  15    6     15    3      15 1998 1999.041
+103 1999     1        4  25  25    2     17    4      16 1998 1999.068
+106 1999     1        4  28  28    5     17    5      17 1998 1999.077
+111 1999     2        5   2  33    3     18    5      17 1998 1999.090
+120 1999     2        5  11  42    5     19    7      19 1998 1999.115
+127 1999     2        5  18  49    5     20    8      20 1998 1999.134
+134 1999     2        5  25  56    5     21    9      21 1998 1999.153
