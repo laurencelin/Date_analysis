@@ -8,6 +8,14 @@ ma = function(x,n=5){
 	filter(x,rep(1/n,n), sides=2)
 }
 
+can.be.numeric <- function(x) {
+    stopifnot(is.atomic(x) || is.list(x)) # check if x is a vector
+    numNAs <- sum(is.na(x))
+    numNAs_new <- suppressWarnings(sum(is.na(as.numeric(x))))
+    return(numNAs_new == numNAs)
+}
+
+
 ##------------------------------------ for convenience ------------------------------------##
 keyTable = function(data){
 	return <- cbind(1:ncol(data), colnames(data) )
