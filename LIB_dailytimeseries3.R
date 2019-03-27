@@ -81,7 +81,7 @@ monthlyTick = function(dd){
 	
 quarterlyTick = function(dd){
 	x <- as.POSIXlt(dd)
-	return <- dd[x$mday==1 & x$mon%in%(c(1,4,6,9)-1) ]
+	return <- dd[x$mday==1 & x$mon%in%(c(1,4,7,10)-1) ]
 }#function
 	
 annualTick = function(dd){
