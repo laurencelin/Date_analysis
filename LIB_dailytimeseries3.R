@@ -35,7 +35,10 @@ dailyTimeSeries = function(x,beginning=NA,ending=NA){
 	
 	## --- water year always starts from Oct 1.
 	start_month=10; grpTable$wy = grpTable$year + ifelse(grpTable$month>=start_month,0,-1) # offset, start_month=10
-		
+	
+	## -- 52 week year cycle
+	grpTable$w52yy = seq_len(dim(grpTable)[1])%/%(52*7)+1
+	
 	## --- 
 	grpTable$ydecimal = grpTable$year+ grpTable$doy/sapply(grpTable$year,function(xx){ifelse(xx%%400==0,366,ifelse(xx%%4==0 & xx%%100!=0, 366, 365))})
 
