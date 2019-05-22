@@ -4,7 +4,7 @@ vectorMin = function(aa,bb){
 	sapply(seq_along(aa),function(ii){min(aa[ii],bb[ii])})
 }#function
 
-ma = function(x,n=5){
+movingAverage = function(x,n=5){
 	filter(x,rep(1/n,n), sides=2)
 }
 
