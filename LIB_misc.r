@@ -48,7 +48,7 @@ fivedayblockbaseflow = function(x){
 	blockIDx = which(blockIDx_==3) ##<<< ----- missing one at the end
 	if(length(blockIDx)<max(blockID)){ blockIDx = append(blockIDx, length(x)) }
 	
-	minima = grpMins(x, blockID)
+	minima = tapply(x,blockID, min, na.rm=T) #grpMins(x, blockID)
 	baseline = rep(NA,length(minima))
 	for(i in 2:(length(baseline)-1)){
 		if(0.9*minima[i]<minima[i-1] | 0.9*minima[i]<minima[i+1] ){baseline[i]=minima[i]}
