@@ -1,5 +1,5 @@
 
-##------------------------------------ vectorize process ------------------------------------##
+
 vectorMin = function(aa,bb){
 	sapply(seq_along(aa),function(ii){min(aa[ii],bb[ii])})
 }#function
@@ -39,8 +39,38 @@ normalize=function(x){
 	return <- (x-xmean)/sd(x)
 }
 
+##------------------------------------ special functions ------------------------------------##
+fivedayblockbaseflow = function(x){
+	## 5 day block
+	num5dblock=as.integer(length(x)/5)
+	blockID = c(rep(1: num5dblock,each=5),rep(num5dblock+1,(length(x)-5* num5dblock) ))
+	blockIDx_ = c(rep(1:5, num5dblock),1:(length(x)-5* num5dblock) )
+	blockIDx = which(blockIDx_==3) ##<<< ----- missing one at the end
+	if(length(blockIDx)<max(blockID)){ blockIDx = append(blockIDx, length(x)) }
+	
+	minima = grpMins(x, blockID)
+	baseline = rep(NA,length(minima))
+	for(i in 2:(length(baseline)-1)){
+		if(0.9*minima[i]<minima[i-1] | 0.9*minima[i]<minima[i+1] ){baseline[i]=minima[i]}
+	}#i
+	i=length(baseline);baseline[i]=minima[i]; #if(0.9*minima[i]<minima[i-1]){baseline[i]=minima[i]}
+	i=1; baseline[i]=minima[i]; #if(0.9*minima[i]<minima[i+1]){baseline[i]=minima[i]}
+	
+	#plot(x,type='l')
+	#points(blockIDx, baseline,col="red")
+	
+	cond = !is.na(baseline)
+	baseflowPt = baseline[cond]
+	baseflowPtx = blockIDx[cond]
+	tmp =approx(x= baseflowPtx,y=baseflowPt,xout=1:length(x),yleft=baseflowPt[1],yright=baseflowPt[length(baseflowPt)] )
+	baseflow=tmp$y
+	for(i in 1:length(baseflow)){
+		if(!is.na(x[i])){if(baseflow[i]>x[i]){baseflow[i]=x[i]}}
+	}
 
-
+	return <- baseflow
+	#lines(baseflow,lty=2,col="green")
+}
 
 
 
