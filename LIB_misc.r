@@ -39,6 +39,10 @@ normalize=function(x){
 	return <- (x-xmean)/sd(x)
 }
 
+rescale = function(x){
+	return <- (x-min(x)/(max(x) - min(x))
+}
+
 ##------------------------------------ special functions ------------------------------------##
 fivedayblockbaseflow = function(x){
 	## 5 day block
