@@ -11,7 +11,7 @@ movingAverage = function(x,n=5){
 can.be.numeric <- function(x) {
     stopifnot(is.atomic(x) || is.list(x)) # check if x is a vector
     numNAs <- sum(is.na(x))
-    numNAs_new <- suppressWarnings(sum(is.na(as.numeric(x))))
+    numNAs_new <- suppressWarnings( sum(is.na(as.numeric(x))) )
     return(numNAs_new == numNAs)
 }
 
