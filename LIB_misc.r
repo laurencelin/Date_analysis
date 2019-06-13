@@ -40,7 +40,7 @@ normalize=function(x){
 }
 
 rescale = function(x){
-	return <- (x-min(x)/(max(x) - min(x))
+	return <- (x-min(x))/(max(x) - min(x))	
 }
 
 ##------------------------------------ special functions ------------------------------------##
