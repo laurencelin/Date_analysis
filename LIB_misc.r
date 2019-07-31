@@ -43,6 +43,10 @@ rescale = function(x){
 	return <- (x-min(x))/(max(x) - min(x))	
 }
 
+most = function(x){
+	tmp = table(x);
+	return <- as.numeric(names(tmp)[which.max(tmp)])
+}
 ##------------------------------------ special functions ------------------------------------##
 fivedayblockbaseflow = function(x){
 	## 5 day block
