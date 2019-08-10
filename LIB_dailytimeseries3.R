@@ -76,7 +76,50 @@ unionDate = function(xlist){
 	return <- seq.Date(from=min(tmp), to=max(tmp) ,by="day")
 }#
 
+## ---- extend time series
+LeapCond = function(x){ return <- x%%400==0 | (x%%4==0 & x%%100!=0) }
+extendingTimeSeries = function(inputDates){
+	dataYears = as.numeric(format(inputDates,'%Y'))
+	dataYearsIndex = tapply(seq_along(dataYears), dataYears,function(x){return <- x})
+	countDayYear = tapply(rain.date, dataYears,length); countDayYear
+	completedYears = as.numeric(names(countDayYear)[countDayYear>=365])
+	repeatedTimes = ceiling(100/length(completedYears))
+	completedYears_LeapCond = LeapCond(completedYears)
+	
+	# ... proposed time 
+	proposedYears = rev(seq(completedYears[length(completedYears)],length.out=(repeatedTimes*length(completedYears)), by=-1))
+	proposedYears_LeapCond = LeapCond(proposedYears)
+	
+	# ... find the missing years
+	missingCond = -match(completedYears,proposedYears)
+	missingPattern = rev(proposedYears_LeapCond[missingCond]); missingPatternLen = length(missingPattern)
+	dataPattern = rev(completedYears_LeapCond); dataPatternLen = length(dataPattern)
+	
+	trials = do.call(cbind, lapply(0:(dataPatternLen-1), function(i){
+		do.call(cbind, lapply(0:(dataPatternLen-1), function(j){
+			if( (1+i)<(dataPatternLen-j) ){
+				tmp = dataPattern[(1+i):(dataPatternLen-j)]
+				repTime = ceiling(missingPatternLen/length(tmp))
+				return <- c(
+					sum(rep(tmp,repTime)[seq_len(missingPatternLen)] == missingPattern)== missingPatternLen,
+					length(tmp),
+					i,j, repTime)
+			}else{
+				return <- c(0,0,i,j,0)
+			}
+		}) )#j
+	}))#i
+	
+	passed_trials = trials[,trials[1,]>0]
+	starti = passed_trials[,order(passed_trials[2,],decreasing=T)][3,1]
+	endj = passed_trials[,order(passed_trials[2,],decreasing=T)][4,1]
+	repTim = passed_trials[,order(passed_trials[2,],decreasing=T)][5,1]
+	repatingYears = rep(rev(rev(completedYears)[(1+starti):(dataPatternLen-endj)]), repTim)
+	
+	return <- do.call(c,lapply(c(repatingYears,completedYears), function(ii){ return <- dataYearsIndex[[toString(ii)]] }))	 # finalIndex
+}#
 
+## ---- select days for plotting
 monthlyTick = function(dd){
 	x <- as.POSIXlt(dd)
 	return <- dd[x$mday==1]
