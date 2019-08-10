@@ -81,7 +81,7 @@ LeapCond = function(x){ return <- x%%400==0 | (x%%4==0 & x%%100!=0) }
 extendingTimeSeries = function(inputDates){
 	dataYears = as.numeric(format(inputDates,'%Y'))
 	dataYearsIndex = tapply(seq_along(dataYears), dataYears,function(x){return <- x})
-	countDayYear = tapply(rain.date, dataYears,length); countDayYear
+	countDayYear = tapply(inputDates, dataYears,length); countDayYear
 	completedYears = as.numeric(names(countDayYear)[countDayYear>=365])
 	repeatedTimes = ceiling(100/length(completedYears))
 	completedYears_LeapCond = LeapCond(completedYears)
