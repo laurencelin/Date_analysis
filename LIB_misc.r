@@ -1,4 +1,4 @@
-
+options(stringsAsFactors = FALSE)
 
 vectorMin = function(aa,bb){
 	sapply(seq_along(aa),function(ii){min(aa[ii],bb[ii])})
@@ -81,6 +81,79 @@ fivedayblockbaseflow = function(x){
 }
 
 
+##------------------------------------ GIS map coloring functions ------------------------------------##
+coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL, BREAKS=NULL){
+    # map is list of maps
+    ALL = do.call(c,lapply(seq_along(maps),function(ii){ maps[[ii]] }))
+    if(is.null(BREAKS) & !is.null(DELTASIZE)){
+        # use DELTASIZE
+        theLOW = floor(min(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
+        theHIGH = ceiling(max(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
+        breaks_ = seq(theLOW,theHIGH,DELTASIZE);
+    }else if(!is.null(BREAKS)){
+        # use breaks_
+        theLOW = min(ALL,na.rm=T)
+        theHIGH = max(ALL,na.rm=T)
+        breaks_ = BREAKS;
+        if(min(breaks_) > theLOW) breaks_ = c(theLOW*0.999,breaks_)
+        if(max(breaks_) < theHIGH) breaks_ = c(breaks_,theHIGH*1.001)
+    }else{
+        # use none
+        theLOW = min(ALL,na.rm=T)
+        theHIGH = max(ALL,na.rm=T)
+        breaks_ = seq(theLOW,theHIGH,length.out=300)
+    }
+    
+    
+    if(theLOW<0 & theHIGH>0){
+        # special case for difference
+        ZEROCOLOR = which(COLORS=='white')
+        if( length(ZEROCOLOR)>0 & ZEROCOLOR>1 ){
+            if(length(COLORS)>ZEROCOLOR){
+                colorFUN = colorRampPalette(COLORS[ZEROCOLOR:length(COLORS)])
+            }else{
+                colorFUN = colorRampPalette(c(COLORS[ZEROCOLOR],'blue'))
+            }#
+            colorlist = colorFUN( sum(breaks_>=0) );
+            
+            INVERTED_COLORS = COLORS[1:ZEROCOLOR]
+            colorFUN = colorRampPalette( INVERTED_COLORS)
+            inverted_colorlist = colorFUN( sum(breaks_<0) );
+            colorlist = c(inverted_colorlist,colorlist)
+        }else{
+            colorFUN = colorRampPalette( COLORS)
+            colorlist = colorFUN( sum(breaks_>=0) );
+            
+            INVERTED_COLORS = sapply(rev(COLORS),function(x){ do.call(rgb, as.list(abs(col2rgb(x)-255)/255)) })
+            colorFUN = colorRampPalette( INVERTED_COLORS)
+            inverted_colorlist = colorFUN( sum(breaks_<0) );
+            colorlist = c(inverted_colorlist,rgb(1,1,1),colorlist)
+        }
+    }else{
+        colorFUN = colorRampPalette( COLORS)
+        colorlist = colorFUN(length(breaks_));
+    }#
+    
+    result = hist(ALL, breaks=breaks_, border=colorlist);
+    return <- data.frame(bp=result$breaks, col=sapply(colorlist,function(x){ paste(col2rgb(x),collapse=':')}) );
+}#function
+
+colorBarImage = function(cs,digits=1,vertical=F){
+    colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
+    xx = seq_along(cs$bp)
+    xx_mark = quantile(xx/max(xx),probs=c(0,0.25,0.5,0.75,1))
+    if(vertical){
+        dev.new(width=4,height=1);
+        par(mar=c(1,1,3,1))
+        image(as.matrix(xx),col=colorscheme_RCOL,yaxt='n',xaxt='n')
+        axis(3, at=xx_mark, labels=round(quantile(cs$bp,probs=c(0,0.25,0.5,0.75,1)),digits),las=2)
+    }else{
+        dev.new(width=4,height=1);
+        par(mar=c(3,1,1,1))
+        image(as.matrix(xx),col=colorscheme_RCOL,yaxt='n',xaxt='n')
+        axis(1, at=xx_mark, labels=round(quantile(cs$bp,probs=c(0,0.25,0.5,0.75,1)),digits),las=1)
+    }
+}#function
 
 
 
