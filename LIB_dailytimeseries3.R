@@ -80,7 +80,7 @@ unionDate = function(xlist){
 LeapCond = function(x){ return <- x%%400==0 | (x%%4==0 & x%%100!=0) }
 extendingTimeSeries = function(inputDates){
 	
-	inputDates = rain.date
+    #inputDates = rain.date # for debug
 	
 	dataYears = as.numeric(format(inputDates,'%Y'))
 	dataYearsIndex = tapply(seq_along(dataYears), dataYears,function(x){return <- x})
@@ -89,6 +89,8 @@ extendingTimeSeries = function(inputDates){
 	repeatedTimes = ceiling(100/length(completedYears))
 	completedYears_LeapCond = LeapCond(completedYears)
 	
+    incompletedYears = as.numeric(names(countDayYear)[countDayYear<365])
+    
 	# ... proposed time 
 	proposedYears = rev(seq(completedYears[length(completedYears)],length.out=(repeatedTimes*length(completedYears)), by=-1))
 	proposedYears_LeapCond = LeapCond(proposedYears)
@@ -118,10 +120,14 @@ extendingTimeSeries = function(inputDates){
 	endj = passed_trials[,order(passed_trials[2,],decreasing=T)][4,1]
 	repTim = passed_trials[,order(passed_trials[2,],decreasing=T)][5,1]
 	repatingYears = rev((rep(rev(completedYears)[(1+starti):(dataPatternLen-endj)], repTim))[seq_len(missingPatternLen)])
-	
+    
+    ## find incompletedYears (future years) that are great than completedYears
+    tobeIncludedincompletedYears = incompletedYears[incompletedYears>max(completedYears)]
+    finalIndex = do.call(c,lapply(c(repatingYears,completedYears,tobeIncludedincompletedYears), function(ii){ return <- dataYearsIndex[[toString(ii)]] }))
+    
 	return <- list(
-		extended_Index = do.call(c,lapply(c(repatingYears,completedYears), function(ii){ return <- dataYearsIndex[[toString(ii)]] })),	 # finalIndex
-		extended_Dates = rev(seq(inputDates[ finalIndex[length(finalIndex)] ], length.out=length(finalIndex), by=-1))
+		extended_Index = finalIndex,	 # finalIndex
+		extended_Dates = rev( seq( inputDates[finalIndex[length(finalIndex)]], length.out=length(finalIndex), by=-1) )
 	)#list
 }#
 
