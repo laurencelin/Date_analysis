@@ -78,15 +78,16 @@ unionDate = function(xlist){
 
 ## ---- extend time series
 LeapCond = function(x){ return <- x%%400==0 | (x%%4==0 & x%%100!=0) }
-extendingTimeSeries = function(inputDates){
+extendingTimeSeries = function(inputDates,NumOfYear=100){
 	
     #inputDates = rain.date # for debug
-	
+    minusFromLeap = (1:366)[-60] # feb 29
+    plusToLeap = c(1:60,60,61:365)
 	dataYears = as.numeric(format(inputDates,'%Y'))
 	dataYearsIndex = tapply(seq_along(dataYears), dataYears,function(x){return <- x})
 	countDayYear = tapply(inputDates, dataYears,length); countDayYear
 	completedYears = as.numeric(names(countDayYear)[countDayYear>=365])
-	repeatedTimes = ceiling(100/length(completedYears))
+	repeatedTimes = ceiling(NumOfYear/length(completedYears))
 	completedYears_LeapCond = LeapCond(completedYears)
 	
     incompletedYears = as.numeric(names(countDayYear)[countDayYear<365])
@@ -99,14 +100,20 @@ extendingTimeSeries = function(inputDates){
 	missingCond = -match(completedYears,proposedYears)
 	missingPattern = rev(proposedYears_LeapCond[missingCond]); missingPatternLen = length(missingPattern)
 	dataPattern = rev(completedYears_LeapCond); dataPatternLen = length(dataPattern)
-	
+    # rev(proposedYears[missingCond])
+    # rev(completedYears)
+    # try to match the leap year patterns
+    
 	trials = do.call(cbind, lapply(0:(dataPatternLen-1), function(i){
 		do.call(cbind, lapply(0:(dataPatternLen-1), function(j){
 			if( (1+i)<(dataPatternLen-j) ){
 				tmp = dataPattern[(1+i):(dataPatternLen-j)]
 				repTime = ceiling(missingPatternLen/length(tmp))
+                cbind(
+                    rep(tmp,repTime)[seq_len(missingPatternLen)],
+                    missingPattern)
 				return <- c(
-					sum(rep(tmp,repTime)[seq_len(missingPatternLen)] == missingPattern)== missingPatternLen,
+					sum(rep(tmp,repTime)[seq_len(missingPatternLen)] == missingPattern) / missingPatternLen,
 					length(tmp),
 					i,j, repTime)
 			}else{
@@ -114,18 +121,32 @@ extendingTimeSeries = function(inputDates){
 			}
 		}) )#j
 	}))#i
-	
-	passed_trials = trials[,trials[1,]>0]
+    # trials[1,] = ZEROs -> what does it mean?
+    passed_trials = trials[,which(trials[1,]>=max(trials[1,])), drop=F] #trials[,trials[1,]>0]
 	starti = passed_trials[,order(passed_trials[2,],decreasing=T)][3,1]
 	endj = passed_trials[,order(passed_trials[2,],decreasing=T)][4,1]
 	repTim = passed_trials[,order(passed_trials[2,],decreasing=T)][5,1]
 	repatingYears = rev((rep(rev(completedYears)[(1+starti):(dataPatternLen-endj)], repTim))[seq_len(missingPatternLen)])
+    repatingYears_LeapCond = LeapCond(repatingYears)
+    repatingYearsAdjust_Cond = rev(missingPattern) - repatingYears_LeapCond
+    # cbind(repatingYears_LeapCond, rev(missingPattern))
+    # cbind(repatingYears, repatingYearsAdjust_Cond)
     
     ## find incompletedYears (future years) that are great than completedYears
     tobeIncludedincompletedYears = incompletedYears[incompletedYears>max(completedYears)]
-    finalIndex = do.call(c,lapply(c(repatingYears,completedYears,tobeIncludedincompletedYears), function(ii){ return <- dataYearsIndex[[toString(ii)]] }))
+    allYears = c(repatingYears,completedYears,tobeIncludedincompletedYears)
+    allYears_dataYearsIndex_adjust = c(repatingYearsAdjust_Cond,rep(F,length(completedYears)),rep(F,length(tobeIncludedincompletedYears)))
+    finalIndex = do.call(c,lapply(seq_along(allYears), function(ii){
+        if(allYears_dataYearsIndex_adjust[ii]<0){
+            return <- dataYearsIndex[[ toString(allYears[ii]) ]][minusFromLeap]
+        }else if(allYears_dataYearsIndex_adjust[ii]<0){
+            return <- dataYearsIndex[[ toString(allYears[ii]) ]][plusToLeap]
+        }else{
+            return <- dataYearsIndex[[ toString(allYears[ii]) ]]
+        }
+    }))#do.call
     
-	return <- list(
+    return <- list(
 		extended_Index = finalIndex,	 # finalIndex
 		extended_Dates = rev( seq( inputDates[finalIndex[length(finalIndex)]], length.out=length(finalIndex), by=-1) )
 	)#list
