@@ -21,12 +21,24 @@ keyTable = function(data){
 	return <- cbind(1:ncol(data), colnames(data) )
 }
 
-makeTransparent<-function(someColor, alpha=255)
-{
+makeTransparent<-function(someColor, alpha=255){
   newColor<-col2rgb(someColor)
   apply(newColor, 2, function(curcoldata){rgb(red=curcoldata[1], green=curcoldata[2],
     blue=curcoldata[3],alpha=alpha/100*255, maxColorValue=255)})
 }
+
+## https://www.dataanalytics.org.uk/make-transparent-colors-in-r/
+## Transparent colors
+## Mark Gardener 2015
+## www.dataanalytics.org.uk
+t_col <- function(color, percent = 50, name = NULL) {
+	rgb.val <- col2rgb(color)
+	return <- rgb(rgb.val[1], rgb.val[2], rgb.val[3],
+	             max = 255,
+	             alpha = (100 - percent) * 255 / 100,
+	             names = name)
+}
+
 
 NSE=function(obs,y){
 	#assume no zero/NA/Inf, filtered, clean
