@@ -173,9 +173,9 @@ quantileCorrection = function(obs, pred, obsIndex=2, predIndex=2){
 	# obs1 is data.frame with Date object
 	# pred is a data.frame with Date object
 	# breakdown time into DOY
-	plotTime = intersectDate(list(obs.date, pred.date)) 
-	obs.dtsm = match(plotTime, obs.date)
-	pred.dtsm = match(plotTime, pred.date)
+	plotTime = intersectDate(list(obs$date, pred$date)) 
+	obs.dtsm = match(plotTime, obs$date)
+	pred.dtsm = match(plotTime, pred$date)
 	
 	obsDOY = as.POSIXlt(obs1.date[obs.dtsm])$yday+1
 	predMatchedDOY = as.POSIXlt(pred.date[pred.dtsm])$yday+1
