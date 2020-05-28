@@ -177,9 +177,9 @@ quantileCorrection = function(obs, pred, obsIndex=2, predIndex=2){
 	obs.dtsm = match(plotTime, obs$date)
 	pred.dtsm = match(plotTime, pred$date)
 	
-	obsDOY = as.POSIXlt(obs1.date[obs.dtsm])$yday+1
-	predMatchedDOY = as.POSIXlt(pred.date[pred.dtsm])$yday+1
-	predDOY = as.POSIXlt(pred.date)$yday+1
+	obsDOY = as.POSIXlt(obs$date[obs.dtsm])$yday+1
+	predMatchedDOY = as.POSIXlt(pred$date[pred.dtsm])$yday+1
+	predDOY = as.POSIXlt(pred$date)$yday+1
 	
 	correctedPred = rep(NA,dim(pred)[1])
 	for(ii in 1:366){
