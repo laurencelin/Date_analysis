@@ -93,6 +93,18 @@ fivedayblockbaseflow = function(x){
 }
 
 
+quantileCorrection = function(obs1, obs2, pred){
+	# obs1 and obs2 are data.frame with Date object
+	# pred is a data.frame with Date object
+	# breakdown time into DOY
+	
+	
+}#function
+
+
+
+
+
 ##------------------------------------ GIS map coloring functions ------------------------------------##
 coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL, BREAKS=NULL){
     # map is list of maps

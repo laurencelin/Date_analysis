@@ -169,3 +169,31 @@ annualTick = function(dd){
 }#function
 
 
+quantileCorrection = function(obs, pred, obsIndex=2, predIndex=2){
+	# obs1 is data.frame with Date object
+	# pred is a data.frame with Date object
+	# breakdown time into DOY
+	plotTime = intersectDate(list(obs.date, pred.date)) 
+	obs.dtsm = match(plotTime, obs.date)
+	pred.dtsm = match(plotTime, pred.date)
+	
+	obsDOY = as.POSIXlt(obs1.date[obs.dtsm])$yday+1
+	predMatchedDOY = as.POSIXlt(pred.date[pred.dtsm])$yday+1
+	predDOY = as.POSIXlt(pred.date)$yday+1
+	
+	correctedPred = rep(NA,dim(pred)[1])
+	for(ii in 1:366){
+		cond = abs(obsDOY-ii) <=15 | abs(obsDOY-ii-366) <=15
+		dayGroup = unique(obsDOY[cond])
+		
+		obsData = obs[obs.dtsm, obsIndex][obsDOY %in% dayGroup]
+		predData = pred[, predIndex][predDOY==ii] #<<------- full series!!
+		
+		ECDF = ecdf(pred[pred.dtsm, predIndex][predMatchedDOY %in% dayGroup])
+		correctedPred[predDOY==ii] = sapply(predData,function(xx){ quantile(obsData, ECDF(xx)) })
+		
+	}# for ii for each DOY
+	
+	return <- correctedPred
+	
+}#function
