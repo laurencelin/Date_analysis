@@ -120,7 +120,7 @@ coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL
         if(min(breaks_) > theLOW) breaks_ = c(theLOW,breaks_)
         if(max(breaks_) < theHIGH) breaks_ = c(breaks_,theHIGH)
         
-    }else if(sum(myoptions==c(T,F,F))==3){
+    }else if(sum(myoptions==c(F,F,T))==3){
     	# use nblocks
         theLOW = min(ALL,na.rm=T)
         theHIGH = max(ALL,na.rm=T)
@@ -191,14 +191,23 @@ mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
 	}else{
 		#colorBarImage(cs);
 		colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
-		colrange = do.call(c,lapply(range(basemap,na.rm=T),function(y){return<-ifelse(is.na(y),NA,which.min(abs(y-cs$bp))) }))
+		newvalue = apply(basemap,2,function(xx){ sapply(xx,function(yy){ ifelse(is.na(yy),NA,which.min(abs(cs$bp-yy))) }) })
+		colrange = unique(as.vector(newvalue)); colrange = sort(colrange[!is.na(colrange)]); # = newvalueID
+		fin = apply(newvalue,2,function(xx){ match(xx, colrange) })
+		
+		# newvalue = do.call(cbind, lapply(seq_len(dim(basemap)[2]),function(xx){ 
+			# sapply(basemap[,xx],function(yy){ifelse(is.na(yy),NA,which.min(abs(cs$bp-yy))) }) 
+		# }))
+		
+		#print(colrange)
 		dev.new();
 		par(mar=c(0,0,1,0));
 		image(
-			basemap,
+			fin,
 			asp=yres/xres,main=title,
 			xaxt='n',yaxt='n',bty='n',
-			col=colorscheme_RCOL[colrange[1]: colrange[2]]);}
+			col=colorscheme_RCOL[colrange]);
+	}# end of if
 }#function
 
 
