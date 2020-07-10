@@ -106,13 +106,13 @@ coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL
     
     myoptions = c(!is.null(DELTASIZE), !is.null(BREAKS), !is.null(NBLOCKS))
     
-    if(myoptions==c(T,F,F)){
+    if(sum(myoptions==c(T,F,F))==3){
     	# use DELTASIZE
         theLOW = floor(min(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
         theHIGH = ceiling(max(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
         breaks_ = seq(theLOW,theHIGH,DELTASIZE);
         
-    }else if(myoptions==c(T,F,F)){
+    }else if(sum(myoptions==c(T,F,F))==3){
     	# use breaks_
         theLOW = min(ALL,na.rm=T)
         theHIGH = max(ALL,na.rm=T)
@@ -120,7 +120,7 @@ coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL
         if(min(breaks_) > theLOW) breaks_ = c(theLOW,breaks_)
         if(max(breaks_) < theHIGH) breaks_ = c(breaks_,theHIGH)
         
-    }else if(myoptions==c(T,F,F)){
+    }else if(sum(myoptions==c(T,F,F))==3){
     	# use nblocks
         theLOW = min(ALL,na.rm=T)
         theHIGH = max(ALL,na.rm=T)
