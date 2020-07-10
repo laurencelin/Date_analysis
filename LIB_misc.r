@@ -95,28 +95,45 @@ fivedayblockbaseflow = function(x){
 
 
 ##------------------------------------ GIS map coloring functions ------------------------------------##
-coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL, BREAKS=NULL){
+coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL, BREAKS=NULL, NBLOCKS=NULL, MAXV=NULL, MINV=NULL){
     # map is list of maps
-    ALL = do.call(c,lapply(seq_along(maps),function(ii){ maps[[ii]] }))
-    if(is.null(BREAKS) & !is.null(DELTASIZE)){
-        # use DELTASIZE
+    ALL = do.call(c,lapply(seq_along(maps),function(ii){ 
+    	cond = !is.na(maps[[ii]])
+    	return <- maps[[ii]][cond]
+    }))
+    if(!is.null(MAXV)){ ALL = ALL[ALL <= MAXV] }
+    if(!is.null(MINV)){ ALL = ALL[ALL >= MINV] }
+    
+    myoptions = c(!is.null(DELTASIZE), !is.null(BREAKS), !is.null(NBLOCKS))
+    
+    if(myoptions==c(T,F,F)){
+    	# use DELTASIZE
         theLOW = floor(min(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
         theHIGH = ceiling(max(ALL,na.rm=T)/DELTASIZE)*DELTASIZE
         breaks_ = seq(theLOW,theHIGH,DELTASIZE);
-    }else if(!is.null(BREAKS)){
-        # use breaks_
+        
+    }else if(myoptions==c(T,F,F)){
+    	# use breaks_
         theLOW = min(ALL,na.rm=T)
         theHIGH = max(ALL,na.rm=T)
         breaks_ = BREAKS;
-        if(min(breaks_) > theLOW) breaks_ = c(theLOW*0.999,breaks_)
-        if(max(breaks_) < theHIGH) breaks_ = c(breaks_,theHIGH*1.001)
+        if(min(breaks_) > theLOW) breaks_ = c(theLOW,breaks_)
+        if(max(breaks_) < theHIGH) breaks_ = c(breaks_,theHIGH)
+        
+    }else if(myoptions==c(T,F,F)){
+    	# use nblocks
+        theLOW = min(ALL,na.rm=T)
+        theHIGH = max(ALL,na.rm=T)
+        breaks_ = seq(theLOW,theHIGH,length.out=NBLOCKS)
+
     }else{
-        # use none
+    	# use none
         theLOW = min(ALL,na.rm=T)
         theHIGH = max(ALL,na.rm=T)
         breaks_ = seq(theLOW,theHIGH,length.out=300)
     }
     
+        
     
     if(theLOW<0 & theHIGH>0){
         # special case for difference
@@ -168,7 +185,21 @@ colorBarImage = function(cs,digits=1,vertical=F){
     }
 }#function
 
-
+mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
+	if(is.null(cs)){
+		dev.new();par(mar=c(1,1,1,1));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
+	}else{
+		#colorBarImage(cs);
+		colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
+		colrange = do.call(c,lapply(range(basemap,na.rm=T),function(y){return<-ifelse(is.na(y),NA,which.min(abs(y-cs$bp))) }))
+		dev.new();
+		par(mar=c(0,0,1,0));
+		image(
+			basemap,
+			asp=yres/xres,main=title,
+			xaxt='n',yaxt='n',bty='n',
+			col=colorscheme_RCOL[colrange[1]: colrange[2]]);}
+}#function
 
 
 
