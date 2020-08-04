@@ -15,6 +15,29 @@ can.be.numeric <- function(x) {
     return(numNAs_new == numNAs)
 }
 
+# (this part can be read in from stationList.csv)	
+# https://stackoverflow.com/questions/17288197/reading-a-csv-file-organized-horizontally
+# modified by Lin June 23 2018
+read.tcsv = function(file=NULL, text=NULL, nfield=NULL, header=T, sep=",", vskip=0, hskip=0, ...) {
+	if(!is.null(file)){
+		n = max(count.fields(file, sep=sep), na.rm=TRUE)
+		x = readLines(file)
+	}else if(!is.null(text) & !is.null(nfield)){
+		n = nfield
+		x = text
+	}
+
+	.splitvar = function(x, sep, n) {
+		var = unlist(strsplit(x, split=sep))
+	    length(var) = n
+	    return(var)
+	}#function
+	x = do.call(cbind, lapply(x[(vskip+1):length(x)], .splitvar, sep=sep, n=n))
+	x = apply(x[(hskip+1):dim(x)[1],], 1, paste, collapse=sep) 
+	out = read.csv(text=x, sep=sep, header=header, skip=0, ...)
+	return(out)
+}#function	
+
 
 ##------------------------------------ for convenience ------------------------------------##
 keyTable = function(data){
