@@ -210,7 +210,7 @@ colorBarImage = function(cs,digits=1,vertical=F){
 
 mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
 	if(is.null(cs)){
-		dev.new();par(mar=c(1,1,1,1));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
+		dev.new();par(mar=c(2,2,2,2));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
 	}else{
 		#colorBarImage(cs);
 		colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
