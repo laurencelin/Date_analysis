@@ -209,8 +209,14 @@ colorBarImage = function(cs,digits=1,vertical=F){
 }#function
 
 mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
+	
+	stats = c(
+		sum=sum(basemap,na.rm=T),
+		mean=mean(basemap,na.rm=T),
+		quantile(basemap,c(0.025,0.25,0.5,0.75,1-0.025),na.rm=T))
+	print(stats)
 	if(is.null(cs)){
-		dev.new();par(mar=c(2,2,2,2));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
+		dev.new();par(mar=c(1,1,2,1));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
 	}else{
 		#colorBarImage(cs);
 		colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
@@ -224,7 +230,7 @@ mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
 		
 		#print(colrange)
 		dev.new();
-		par(mar=c(0,0,1,0));
+		par(mar=c(1,1,2,1));
 		image(
 			fin,
 			asp=yres/xres,main=title,
