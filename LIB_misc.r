@@ -80,7 +80,7 @@ rescale = function(x){
 
 most = function(x){
 	tmp = table(x);
-	return <- as.numeric(names(tmp)[which.max(tmp)])
+	return <- ifelse(length(tmp)>0,as.numeric(names(tmp)[which.max(tmp)]),NA)
 }
 ##------------------------------------ special functions ------------------------------------##
 fivedayblockbaseflow = function(x){
