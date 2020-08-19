@@ -191,24 +191,24 @@ coloringMultiMAPS = function(maps,COLORS=c('red','white','blue'), DELTASIZE=NULL
     return <- data.frame(bp=result$breaks, col=sapply(colorlist,function(x){ paste(col2rgb(x),collapse=':')}) );
 }#function
 
-colorBarImage = function(cs,digits=1,vertical=F){
+colorBarImage = function(cs,digits=1,vertical=F, ...){
     colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
     xx = seq_along(cs$bp)
     xx_mark = quantile(xx/max(xx),probs=c(0,0.25,0.5,0.75,1))
     if(vertical){
-        dev.new(width=4,height=1);
-        par(mar=c(1,1,3,1))
-        image(as.matrix(xx),col=colorscheme_RCOL,yaxt='n',xaxt='n')
-        axis(3, at=xx_mark, labels=round(quantile(cs$bp,probs=c(0,0.25,0.5,0.75,1)),digits),las=2)
+        dev.new(width=1.2,height=4);
+        par(mar=c(1,1,1,4), ...)
+        image(t(as.matrix(xx)),col=colorscheme_RCOL,yaxt='n',xaxt='n')
+        axis(4, at=xx_mark, labels=round(quantile(cs$bp,probs=c(0,0.25,0.5,0.75,1)),digits),las=2)
     }else{
         dev.new(width=4,height=1);
-        par(mar=c(3,1,1,1))
+        par(mar=c(3,1,1,1), ...)
         image(as.matrix(xx),col=colorscheme_RCOL,yaxt='n',xaxt='n')
         axis(1, at=xx_mark, labels=round(quantile(cs$bp,probs=c(0,0.25,0.5,0.75,1)),digits),las=1)
     }
 }#function
 
-mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
+mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1, new=T){
 	
 	stats = c(
 		sum=sum(basemap,na.rm=T),
@@ -216,7 +216,8 @@ mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
 		quantile(basemap,c(0.025,0.25,0.5,0.75,1-0.025),na.rm=T))
 	print(stats)
 	if(is.null(cs)){
-		dev.new();par(mar=c(1,1,2,1));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
+		if(new) dev.new();
+		par(mar=c(1,1,2,1));image(basemap,asp=yres/xres,xaxt='n',yaxt='n',bty='n',main=title); 
 	}else{
 		#colorBarImage(cs);
 		colorscheme_RCOL = sapply(cs$col, function(x){do.call(rgb, as.list(as.numeric(unlist(strsplit(x,split=':')))/255)) })
@@ -229,7 +230,7 @@ mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1){
 		# }))
 		
 		#print(colrange)
-		dev.new();
+		if(new) dev.new();
 		par(mar=c(1,1,2,1));
 		image(
 			fin,
