@@ -240,6 +240,10 @@ mapVisual = function(basemap,title=NULL, cs=NULL, xres=1, yres=1, new=T){
 	}# end of if
 }#function
 
-
+flowDistributionPlot = function(qm3pd, stack=F, ...){
+	xx = seq(0,1,0.01)
+	yy = quantile(qm3pd*1000/3600/24,xx) # --> L/s
+	if(stack){ lines((1-xx)*100, yy, ...) }else{ plot((1-xx)*100, yy, ...) }
+}# function
 
 
