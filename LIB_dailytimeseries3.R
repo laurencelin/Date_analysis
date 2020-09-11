@@ -14,7 +14,7 @@ dailyTimeSeries = function(x,beginning=NA,ending=NA){
 	
 	periodVAR = as.POSIXlt(period)
 	
-	periodVAR_name = c('year','month','day','doy','wday','wy','woy','woy7')
+	periodVAR_name = c('year','month','day','doy','wday','wy','woy','woy7','dowy')
 	grpTable = data.frame(year=periodVAR$year+1900); 
 	grpTable$month = periodVAR$mon+1 ##-----<< annually cyclic >>
 	grpTable$yy_month = match(grpTable$year*100+grpTable$month, unique(grpTable$year*100+grpTable$month))
@@ -27,7 +27,6 @@ dailyTimeSeries = function(x,beginning=NA,ending=NA){
 	grpTable$wday = periodVAR$wday+1 #1-7 (weekdays)
 	
 	tmp = as.numeric(strftime(periodVAR,'%V'))+100*as.numeric(strftime(periodVAR,'%G'))+1000000*grpTable$year
-	#grpTable$woy = week of the year does not make sense for analysis
 	grpTable$yy_woy = match(tmp,unique(tmp))   
 	
 	grpTable$woy7 = grpTable$doy%/%7+1 ##-----<< annually cyclic >>
@@ -35,6 +34,9 @@ dailyTimeSeries = function(x,beginning=NA,ending=NA){
 	
 	## --- water year always starts from Oct 1.
 	start_month=10; grpTable$wy = grpTable$year + ifelse(grpTable$month>=start_month,0,-1) # offset, start_month=10
+	
+	## --- day of water year
+	grpTable$dowy = do.call(c,tapply(grpTable$wy,grpTable$wy,function(xx){ seq_along(xx) }))
 	
 	## -- 52 week year cycle
 	grpTable$w52yy = seq_len(dim(grpTable)[1])%/%(52*7)+1
