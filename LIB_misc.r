@@ -79,7 +79,7 @@ rescale = function(x){
 }
 
 most = function(x){
-	tmp = table(x);
+    tmp = table(x); # ignore NA
 	return <- ifelse(length(tmp)>0,as.numeric(names(tmp)[which.max(tmp)]),NA)
 }
 ##------------------------------------ special functions ------------------------------------##
